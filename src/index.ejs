@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TodoMVC app</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <% if(__PROD__) { %><script src="cordova.js"></script><% } %>
+</head>
+<body>
+  <div id="app">
+    <%= htmlWebpackPlugin.options.getAppContent() %>
+  </div>
+</body>
+</html>
