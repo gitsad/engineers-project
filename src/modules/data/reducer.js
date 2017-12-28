@@ -1,5 +1,15 @@
 import REDUX_CONST from './constants';
 
+
+const mockData = () => {
+    console.log('EXECUTED');
+    const array = [];
+    for (let i = 0; i <= 100; i++) {
+        array.push({current: Math.random(), time: i/10});
+    }
+    return array;
+};
+
 const initialState = {
     data: []
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-onsenui';
+import { Button, Select } from 'react-onsenui';
 import { connect } from 'react-redux';
 import {
     LineChart,
@@ -11,7 +11,7 @@ import {
     Legend
 } from 'recharts';
 import PropTypes from 'prop-types';
-import { addDataFromArduino } from '../actions';
+import { addDataFromArduino, clearData } from '../actions';
 
 function mapStateToProps(state) {
     const { data } = state.dataReducer;
@@ -22,7 +22,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        addDataFromArduino: (data, time) => dispatch(addDataFromArduino(data, time))
+        addDataFromArduino: (data, time) => dispatch(addDataFromArduino(data, time)),
+        clearData: () => dispatch(clearData())
     }
 }
 
@@ -40,9 +41,11 @@ class DataContainer extends React.Component {
         this.graphHeight = window.innerWidth - 70;
         this.timeMeasure = null;
         this.state = {
+            measure: 0.1,
             connected: false,
             arrayMessage: [],
-            time: 0
+            time: 0,
+            timeMeasure: null,
         }
     }
 
@@ -58,12 +61,16 @@ class DataContainer extends React.Component {
         });
     };
     sendDataToReducer = () => {
-        this.props.addDataFromArduino(Number(this.state.arrayMessage.join("")), this.state.time);
+        if((this.state.time*10) % (this.state.measure*10) === 0) {
+            this.props.addDataFromArduino(Number(this.state.arrayMessage.join("")), this.state.time);
+        }
     };
     disconnect = () => {
+        clearInterval(this.timeMeasure);
         serial.close(
             () =>  {
                 clearInterval(this.timeMeasure);
+                this.timeMeasure = null;
                 this.setState({ connected: false });
             },
             () => alert("Wystąpił problem, spróbuj jeszcze raz")
@@ -80,7 +87,7 @@ class DataContainer extends React.Component {
                 this.setState({
                     connected: true
                 });
-                this.timeMeasure = setInterval(() => this.setState({ time: this.state.time + 1 }), 1000);
+                this.timeMeasure = setInterval(() => this.setState({ time: Math.round((this.state.time + 0.1)*10)/10 }), 100);
                 serial.open(
                     {
                         baudRate: 9600
@@ -119,14 +126,25 @@ class DataContainer extends React.Component {
             errorCallback
         )
     };
+    editSelects = (event) => {
+        this.setState({ measure: Number(event.target.value) }, () => {
+            console.log(this.state);
+        });
+    };
+    clearData = () => {
+        this.props.clearData();
+        this.setState({
+            time: 0
+        });
+    }
     render() {
         const connectButton = this.state.connected ? 'Rozłącz' : 'Połącz';
         const connectFunction = this.state.connected ? this.disconnect : this.connect;
         return(
             <div>
                 <LineChart width={this.graphWidth} height={this.graphHeight} data={this.props.data}>
-                    <XAxis dataKey="time" />
-                    <YAxis />
+                    <XAxis dataKey="time" unit="s"/>
+                    <YAxis unit="A"/>
                     <CartesianGrid strokeDasharray="3 3" />
                     <Tooltip />
                     <Legend />
@@ -137,12 +155,29 @@ class DataContainer extends React.Component {
                 >
                     {connectButton}
                 </Button>
+                <Button onClick={this.clearData}>
+                    Clear data
+                </Button>
+                <Select
+                    id="choose-sel"
+                    value={this.state.measure.toString()}
+                    modifier={this.state.measure.toString()}
+                    onChange={this.editSelects}
+                    disabled={this.state.connected}
+                >
+                    <option value="0.1">0.1s</option>
+                    <option value="0.5">0.5s</option>
+                    <option value="1">1s</option>
+                </Select>
+                {this.state.time}
+                {this.state.measure}
+                {(this.state.time*10) % (this.state.measure*10)}
             </div>
         )
     }
 }
 
 DataContainer.propTypes = propTypes;
-DataContainer.defaultProps = defaultProps
+DataContainer.defaultProps = defaultProps;
 
 export default connect(mapStateToProps, mapDispatchToProps)(DataContainer)
