@@ -11,11 +11,14 @@ import {
     Legend
 } from 'recharts';
 import PropTypes from 'prop-types';
+import SaveDataView from '../../../views/SaveDataView.jsx';
 import { addDataFromArduino, clearData } from '../actions';
 
 function mapStateToProps(state) {
+    const { screenNavigator } = state.nav;
     const { data } = state.dataReducer;
     return {
+        screenNavigator,
         data
     }
 }
@@ -55,27 +58,29 @@ class DataContainer extends React.Component {
         });
 
     };
+
     removeData = () => {
         this.setState({
             arrayMessage: []
         });
     };
+
     sendDataToReducer = () => {
         if((this.state.time*10) % (this.state.measure*10) === 0) {
             this.props.addDataFromArduino(Number(this.state.arrayMessage.join("")), this.state.time);
         }
     };
+
     disconnect = () => {
-        clearInterval(this.timeMeasure);
         serial.close(
             () =>  {
                 clearInterval(this.timeMeasure);
-                this.timeMeasure = null;
                 this.setState({ connected: false });
             },
             () => alert("Wystąpił problem, spróbuj jeszcze raz")
         )
     };
+
     connect = () => {
         const errorCallback = (message) => alert('Error: ' + message);
         serial.requestPermission(
@@ -95,9 +100,9 @@ class DataContainer extends React.Component {
                     () => {
                         serial.registerReadCallback(
                             (data) => {
-                                const view = new Uint8Array(data);
-                                const enc = new TextDecoder();
-                                const decodedString = enc.decode(view);
+                                const rawData = new Uint8Array(data);
+                                const decoder = new TextDecoder();
+                                const decodedString = decoder.decode(rawData);
                                 if(decodedString.length >= 1) {
                                     for(let i = 0; i < decodedString.length; i++) {
                                         if(parseInt(decodedString[i].charCodeAt(0)) !== 13) {
@@ -126,23 +131,36 @@ class DataContainer extends React.Component {
             errorCallback
         )
     };
+
     editSelects = (event) => {
         this.setState({ measure: Number(event.target.value) }, () => {
             console.log(this.state);
         });
     };
+
     clearData = () => {
         this.props.clearData();
         this.setState({
             time: 0
         });
-    }
+    };
+
+    pushPage = () => {
+        this.props.screenNavigator.pushPage({
+            component: <SaveDataView />,
+        })
+    };
+
     render() {
         const connectButton = this.state.connected ? 'Rozłącz' : 'Połącz';
         const connectFunction = this.state.connected ? this.disconnect : this.connect;
         return(
             <div>
-                <LineChart width={this.graphWidth} height={this.graphHeight} data={this.props.data}>
+                <LineChart
+                    width={this.graphWidth}
+                    height={this.graphHeight}
+                    data={this.props.data}
+                >
                     <XAxis dataKey="time" unit="s"/>
                     <YAxis unit="A"/>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -150,13 +168,14 @@ class DataContainer extends React.Component {
                     <Legend />
                     <Line type="monotone" dataKey="current" stroke="#8884d8" />
                 </LineChart>
-                <Button
-                    onClick={connectFunction}
-                >
+                <Button onClick={connectFunction}>
                     {connectButton}
                 </Button>
-                <Button onClick={this.clearData}>
-                    Clear data
+                <Button
+                    onClick={this.clearData}
+                    disabled={this.state.connected}
+                >
+                    Wyczyść dane
                 </Button>
                 <Select
                     id="choose-sel"
@@ -169,9 +188,16 @@ class DataContainer extends React.Component {
                     <option value="0.5">0.5s</option>
                     <option value="1">1s</option>
                 </Select>
-                {this.state.time}
-                {this.state.measure}
-                {(this.state.time*10) % (this.state.measure*10)}
+                <div>
+                    <Button
+                        disabled={this.state.connected}
+                        onClick={this.pushPage}
+                        modifier='large'
+                        className="one-button"
+                    >
+                        Zapisz dane
+                    </Button>
+                </div>
             </div>
         )
     }
