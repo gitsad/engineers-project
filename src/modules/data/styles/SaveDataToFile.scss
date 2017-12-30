@@ -1,0 +1,17 @@
+.save-data-to-file {
+  .input-container {
+    margin: 10px 0;
+  }
+  .dialog {
+    @include flexbox();
+    @include justify-content(center);
+    @include align-items(center);
+    @include flex-direction(column);
+    background-color: white;
+    text-align: center;
+    margin: 20px;
+    .dialog-text {
+      text-align: center;
+    }
+  }
+}

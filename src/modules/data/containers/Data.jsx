@@ -151,11 +151,15 @@ class DataContainer extends React.Component {
         })
     };
 
+    popPage = () => {
+        this.props.screenNavigator.popPage();
+    };
+
     render() {
         const connectButton = this.state.connected ? 'Rozłącz' : 'Połącz';
         const connectFunction = this.state.connected ? this.disconnect : this.connect;
         return(
-            <div>
+            <div className="data">
                 <LineChart
                     width={this.graphWidth}
                     height={this.graphHeight}
@@ -168,34 +172,49 @@ class DataContainer extends React.Component {
                     <Legend />
                     <Line type="monotone" dataKey="current" stroke="#8884d8" />
                 </LineChart>
-                <Button onClick={connectFunction}>
-                    {connectButton}
-                </Button>
-                <Button
-                    onClick={this.clearData}
-                    disabled={this.state.connected}
-                >
-                    Wyczyść dane
-                </Button>
-                <Select
-                    id="choose-sel"
-                    value={this.state.measure.toString()}
-                    modifier={this.state.measure.toString()}
-                    onChange={this.editSelects}
-                    disabled={this.state.connected}
-                >
-                    <option value="0.1">0.1s</option>
-                    <option value="0.5">0.5s</option>
-                    <option value="1">1s</option>
-                </Select>
-                <div>
+                <div className="data-buttons">
                     <Button
+                        onClick={connectFunction}
+                        className="one-button"
+                    >
+                        {connectButton}
+                    </Button>
+                    <Button
+                        onClick={this.clearData}
                         disabled={this.state.connected}
+                        className="one-button"
+                    >
+                        Wyczyść dane
+                    </Button>
+                    <Select
+                        className="one-select"
+                        id="choose-sel"
+                        value={this.state.measure.toString()}
+                        modifier={this.state.measure.toString()}
+                        onChange={this.editSelects}
+                        disabled={this.state.connected}
+                    >
+                        <option value="0.1">0.1s</option>
+                        <option value="0.5">0.5s</option>
+                        <option value="1">1s</option>
+                    </Select>
+                </div>
+                <div className="navigation-buttons">
+                    <Button
+                        disabled={this.state.connected || this.props.data.length === 0}
                         onClick={this.pushPage}
                         modifier='large'
                         className="one-button"
                     >
                         Zapisz dane
+                    </Button>
+                    <Button
+                        disabled={this.state.connected}
+                        onClick={this.popPage}
+                        modifier='large'
+                        className="one-button"
+                    >
+                        Wróć
                     </Button>
                 </div>
             </div>

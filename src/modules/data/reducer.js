@@ -1,16 +1,17 @@
 import REDUX_CONST from './constants';
 
-
+/*
 const mockData = () => {
     const array = [];
-    for (let i = 0; i <= 100; i++) {
+    for (let i = 0; i <= 1000; i++) {
         array.push({current: Math.random(), time: i/10});
     }
     return array;
 };
+*/
 
 const initialState = {
-    data: mockData()
+    data: []
 };
 
 export default function dataReducer(state = initialState, action) {

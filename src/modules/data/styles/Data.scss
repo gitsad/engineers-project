@@ -1,0 +1,19 @@
+@import "../../../style/variables";
+.data {
+  padding: 10px;
+  .data-buttons {
+    @include flexbox();
+    @include align-items(center);
+    @include justify-content(space-around);
+    margin: 10px 0;
+    .one-button, .one-select {
+      @include flex(1);
+      margin-right: 10px;
+    }
+  }
+  .navigation-buttons {
+    .one-button {
+      margin: 10px 0;
+    }
+  }
+}

@@ -5,9 +5,6 @@ export default class DataView extends React.Component {
     componentDidMount() {
         window.screen.orientation.lock('landscape');
     }
-    componentWillUnmount() {
-        window.screen.orientation.lock('portrait');
-    }
 
     render() {
         return (

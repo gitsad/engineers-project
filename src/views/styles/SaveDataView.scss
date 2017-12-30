@@ -1,0 +1,12 @@
+@import "../../style/variables";
+.SaveDataView {
+  @include flexbox();
+  @include align-items(center);
+  @include justify-content(center);
+  @include flex-direction(column);
+  height: 100%;
+  padding: 0 10px;
+  .back-button {
+    margin-top: 10px;
+  }
+}

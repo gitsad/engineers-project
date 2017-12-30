@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-onsenui';
+import { Button, Input, ProgressCircular, ProgressBar, AlertDialog } from 'react-onsenui';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -23,11 +23,16 @@ class SaveDataToFile extends React.Component {
         this.logOb = null;
         this.state = {
             nameOfFile: '',
+            loading: false,
+            dialogShown: false,
+            message: '',
         };
     }
     createFile = () => {
         window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, (dir) => {
-            console.log("got main dir", dir);
+            this.setState({
+                loading: true
+            });
             dir.getFile(`${this.state.nameOfFile}.xlsx`,
                 {
                     create:true
@@ -55,21 +60,55 @@ class SaveDataToFile extends React.Component {
             fileWriter.seek(fileWriter.length);
             const blob = new Blob([log], {type:'text/plain'});
             fileWriter.write(blob);
-        }, (err) => { console.log(err) });
+
+            setTimeout(() => { this.showDialog('Plik został utworzony'); }, 1500);
+        }, (err) => {});
+    };
+
+    showDialog = (message) => {
+        this.setState({
+            loading: false,
+            dialogShown: true,
+            nameOfFile: '',
+            message
+        });
+    };
+
+    hideDialog = () => {
+        this.setState({dialogShown: false});
     };
 
     render() {
+        const showLoader = this.state.loading ? <ProgressBar indeterminate /> : <div/>;
         return(
-            <div>
-                <div>
-                    <input
+            <div className="save-data-to-file">
+                {showLoader}
+                <div className="input-container">
+                    <Input
                         type="text"
                         value={this.state.nameOfFile}
                         onChange={(event) => this.setState({ nameOfFile: event.target.value })}
                         placeholder="Nazwa pliku"
                     />
                 </div>
-                <Button onClick={this.createFile}>Create file</Button>
+                <Button
+                    modifier='large'
+                    onClick={this.createFile}
+                >
+                    Create file
+                </Button>
+                <AlertDialog
+                    isOpen={this.state.dialogShown}
+                    isCancelable={false}>
+                    <div className='alert-dialog-content'>
+                        {this.state.message}
+                    </div>
+                    <div className='alert-dialog-footer'>
+                        <button onClick={this.hideDialog} className='alert-dialog-button'>
+                            Ok
+                        </button>
+                    </div>
+                </AlertDialog>
             </div>
         )
     }
