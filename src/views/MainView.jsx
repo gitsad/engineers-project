@@ -19,7 +19,7 @@ class MainView extends React.Component {
         return (
             <div className="StartView">
                 <div className="name-of-app">
-                    Aplikacja pomiaru napięcia
+                    Aplikacja pomiaru natężenia
                 </div>
                 <div className="buttons">
                     <Button

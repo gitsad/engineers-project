@@ -8,7 +8,7 @@ const store = configureStore();
 
 export default class App extends Component {
     componentDidMount() {
-        document.addEventListener("deviceready", onDeviceReady, false);
+        document.addEventListener("deviceready", this.onDeviceReady, false);
     };
     onDeviceReady = () => {
         StatusBar.hide();

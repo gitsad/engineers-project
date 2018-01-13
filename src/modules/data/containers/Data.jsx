@@ -44,7 +44,7 @@ class DataContainer extends React.Component {
         this.graphHeight = window.innerWidth - 70;
         this.timeMeasure = null;
         this.state = {
-            measure: 0.1,
+            sampling: 0.1,
             connected: false,
             arrayMessage: [],
             time: 0,
@@ -66,7 +66,7 @@ class DataContainer extends React.Component {
     };
 
     sendDataToReducer = () => {
-        if((this.state.time*10) % (this.state.measure*10) === 0) {
+        if((this.state.time*10) % (this.state.sampling*10) === 0) {
             this.props.addDataFromArduino(Number(this.state.arrayMessage.join("")), this.state.time);
         }
     };
@@ -82,7 +82,7 @@ class DataContainer extends React.Component {
     };
 
     connect = () => {
-        const errorCallback = (message) => alert('Error: ' + message);
+        const errorCallback = (message) => alert('Błąd: ' + 'Nie wykryto urządzenia');
         serial.requestPermission(
             () => {
                 if (!'TextDecoder' in window) {
@@ -133,7 +133,7 @@ class DataContainer extends React.Component {
     };
 
     editSelects = (event) => {
-        this.setState({ measure: Number(event.target.value) }, () => {
+        this.setState({ sampling: Number(event.target.value) }, () => {
             console.log(this.state);
         });
     };
@@ -189,8 +189,8 @@ class DataContainer extends React.Component {
                     <Select
                         className="one-select"
                         id="choose-sel"
-                        value={this.state.measure.toString()}
-                        modifier={this.state.measure.toString()}
+                        value={this.state.sampling.toString()}
+                        modifier={this.state.sampling.toString()}
                         onChange={this.editSelects}
                         disabled={this.state.connected}
                     >

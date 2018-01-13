@@ -38,7 +38,6 @@ class SaveDataToFile extends React.Component {
                     create:true
                 },
                 (file) => {
-                console.log("got the file", file);
                 this.logOb = file;
                 this.writeLog(this.createString());
             });
@@ -62,7 +61,7 @@ class SaveDataToFile extends React.Component {
             fileWriter.write(blob);
 
             setTimeout(() => { this.showDialog('Plik został utworzony'); }, 1500);
-        }, (err) => {});
+        }, (err) => { this.showDialog('Błąd, spróbuj jeszcze raz'); });
     };
 
     showDialog = (message) => {
